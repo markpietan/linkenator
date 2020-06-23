@@ -19,8 +19,48 @@ async function getAllLinks(){
     throw error
   }
 }
+
+async function createLink({comment, URL}){
+try {
+  const response = await client.query(`
+  INSERT INTO links (name, comment) VALUES($1, $2)
+  ON CONFLICT(name) DO UPDATE SET id = links.id RETURNING *;
+  `, [URL, comment])
+  return response.rows[0]
+} catch (error) {
+ throw error 
+}
+
+}
+
+async function createTag({name}){
+  try {
+    const response = await client.query(`
+    INSERT INTO tags (name) VALUES($1)
+    ON CONFLICT(name) DO UPDATE SET id = tags.id RETURNING *;
+    `, [name])
+    return response.rows[0]
+  } catch (error) {
+   throw error 
+  }
+  
+  }
+
+
+  async function createLinkTags({linkId, tagId}){
+    try {
+      const response = await client.query(`
+      INSERT INTO links_tags ("link_id", "tag_id") VALUES($1, $2)
+      ON CONFLICT("link_id", "tag_id") DO UPDATE SET id = links_tags.id RETURNING *;
+      `, [linkId, tagId])
+      return response.rows[0]
+    } catch (error) {
+     throw error 
+    }
+    
+    }
 // export
 module.exports = {
-  client,
+  client, createLink, createLinkTags, createTag, getAllLinks
   // db methods
 }
