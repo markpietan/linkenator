@@ -12,13 +12,15 @@ if (URL === undefined) {
   res.send({message: "URL is required"})  
 } 
 const link = await createLink({comment, URL})
-const parsedTags = await JSON.parse(tags)
+const parsedTags = tags
+console.log(parsedTags)
 const createdTagArray = parsedTags.map(async element => {
- const response = await createTag({element})   
+    console.log(element)
+ const response = await createTag(element)   
  return response
 });
 console.log(createdTagArray)
 })
 
 
-module.exports = linksRoutergit add .JSON
+module.exports = linksRouter

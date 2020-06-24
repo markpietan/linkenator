@@ -33,7 +33,8 @@ try {
 
 }
 
-async function createTag({name}){
+async function createTag(name){
+  console.log(name)
   try {
     const response = await client.query(`
     INSERT INTO tags (name) VALUES($1)
@@ -42,6 +43,7 @@ async function createTag({name}){
     return response.rows[0]
   } catch (error) {
    throw error 
+  
   }
   
   }
