@@ -4,7 +4,7 @@ const DB_NAME = "linkenator";
 const DB_URL =
   process.env.DATABASE_URL || `postgres://localhost:5432/${DB_NAME}`;
 const client = new Client(DB_URL);
-
+const { generateUpdateString } = require("./../src/api/utils");
 // database methods
 async function getAllLinks() {
   try {
@@ -70,19 +70,72 @@ async function createLinkTags({ linkId, tagId }) {
   }
 }
 
-async function updateLink({id}){
+async function updateLink({ id, fields }) {
   try {
+    const updateString = generateUpdateString(fields);
+    console.log(updateString);
     const response = await client.query(
-      `
+      `UPDATE links SET ${updateString}
+      WHERE id = ${id} RETURNING *;
       `,
-      [id]
+      Object.values(fields)
     );
     return response.rows[0];
   } catch (error) {
     throw error;
   }
-
 }
+
+async function deleteLinkTags({ tags, linkid }) {
+  try {
+    console.log(tags)
+    let tagString = "(";
+    for (let index = 0; index < tags.length; index++) {
+      const element = tags[index];
+      console.log(element)
+      tagString += ` ${element.id},`;
+    }
+    let finishedTagString = tagString.replace(/,$/,")")
+    console.log(finishedTagString)
+    const response = await client.query(`
+    DELETE FROM links_tags
+    WHERE "tag_id"
+    NOT IN ${finishedTagString}
+    AND "link_id" = $1;
+    
+    `, [linkid])
+    console.log(response.rows)
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function deleteFromLinkTagsByLinkId({id}) {
+try {
+  console.log(id)
+  const response = client.query(`
+  DELETE FROM links_tags
+  WHERE "link_id" = $1;
+  `, [id])
+  return 
+} catch (error) {
+  throw error
+}
+}
+
+
+async function deleteLinkById({id}) {
+  try {
+    const response = client.query(`
+    DELETE FROM links
+    WHERE id = $1;
+    `, [id])
+    return 
+  } catch (error) {
+    throw error
+  }
+  }
+  
 
 // export
 module.exports = {
@@ -91,5 +144,9 @@ module.exports = {
   createLinkTags,
   createTag,
   getAllLinks,
+  updateLink,
+  deleteLinkTags,
+  deleteFromLinkTagsByLinkId,
+  deleteLinkById,
   // db methods
 };
