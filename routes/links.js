@@ -38,7 +38,7 @@ linksRouter.get("/", async function (req, res, next) {
     }
   }
   console.log(cleanRows);
-  res.send({ cleanRows });
+  res.send(cleanRows);
 });
 
 linksRouter.post("/", async function (req, res, next) {

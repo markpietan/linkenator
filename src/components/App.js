@@ -1,28 +1,38 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect } from "react";
 import {
-  getSomething
-} from '../api';
+  Container,
+  Button,
+  Header,
+  Segment,
+  Image,
+  Grid,
+} from "semantic-ui-react";
+import { getLinks } from "../api";
+import "semantic-ui-css/semantic.min.css";
+import LinkList from "./LinkList";
 
 const App = () => {
-  const [message, setMessage] = useState('');
+  const [links, setLinks] = useState([]);
 
   useEffect(() => {
-    getSomething()
-      .then(response => {
-        setMessage(response.message);
+    getLinks()
+      .then((response) => {
+        console.log(response)
+        setLinks(response);
       })
-      .catch(error => {
-        setMessage(error.message);
+      .catch((error) => {
+        setLinks(error);
       });
-  });
+  }, []);
 
   return (
-    <div className="App">
-      <h1>Hello, World!</h1>
-      <h2>{ message }</h2>
-    </div>
+    <main>
+      <Header as="h1" content="Linkenator" textAlign="center"></Header>
+      <Container>
+        <LinkList links={links}></LinkList>
+      </Container>
+    </main>
   );
-}
+};
 
 export default App;
