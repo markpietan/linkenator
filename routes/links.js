@@ -9,6 +9,7 @@ const {
   deleteLinkTags,
   deleteFromLinkTagsByLinkId,
   deleteLinkById,
+  addClick,
 } = require("./../db/index.js");
 linksRouter.get("/", async function (req, res, next) {
   const cleanRows = [];
@@ -42,10 +43,12 @@ linksRouter.get("/", async function (req, res, next) {
 });
 
 linksRouter.post("/", async function (req, res, next) {
-  const { comment, URL, tags } = req.body;
+  const { comment, URL, tags } = req.body.data;
+  console.log(req.body)
   if (URL === undefined) {
     res.send({ message: "URL is required" });
   }
+ 
   const link = await createLink({ comment, URL });
   const linkId = link.id;
   const parsedTags = [];
@@ -98,6 +101,12 @@ linksRouter.delete("/:linkid", async function (req, res, next){
   await deleteFromLinkTagsByLinkId({id})
   const response = await deleteLinkById({id})
   res.send({Message: "Link was successfully deleted"})
+})
+
+linksRouter.patch("/clicks/:linkid", async function(req, res, next){
+  const id = req.params.linkid;
+  await addClick({id})
+  res.send({Message: "Click count incremeneted by one"})
 })
 
 module.exports = linksRouter;

@@ -10,16 +10,14 @@ import {
   Label,
 } from "semantic-ui-react";
 
+const TagList = ({ tags, onTagClick }) => {
+  return (
+    <div>
+      {tags.map(function (e, index) {
+        return <Label key= {index} onClick= {() => {onTagClick(e)}} cursor= "pointer">{e}</Label>;
+      })}
+    </div>
+  );
+};
 
-
-const TagList = ({tags}) => {
-return(
-<div>taglist</div>
-
-)
-
-}
-
-
-
-export default TagList
+export default TagList;

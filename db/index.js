@@ -88,54 +88,77 @@ async function updateLink({ id, fields }) {
 
 async function deleteLinkTags({ tags, linkid }) {
   try {
-    console.log(tags)
+    console.log(tags);
     let tagString = "(";
     for (let index = 0; index < tags.length; index++) {
       const element = tags[index];
-      console.log(element)
+      console.log(element);
       tagString += ` ${element.id},`;
     }
-    let finishedTagString = tagString.replace(/,$/,")")
-    console.log(finishedTagString)
-    const response = await client.query(`
+    let finishedTagString = tagString.replace(/,$/, ")");
+    console.log(finishedTagString);
+    const response = await client.query(
+      `
     DELETE FROM links_tags
     WHERE "tag_id"
     NOT IN ${finishedTagString}
     AND "link_id" = $1;
     
-    `, [linkid])
-    console.log(response.rows)
+    `,
+      [linkid]
+    );
+    console.log(response.rows);
   } catch (error) {
     throw error;
   }
 }
 
-async function deleteFromLinkTagsByLinkId({id}) {
-try {
-  console.log(id)
-  const response = client.query(`
+async function deleteFromLinkTagsByLinkId({ id }) {
+  try {
+    console.log(id);
+    const response = await client.query(
+      `
   DELETE FROM links_tags
   WHERE "link_id" = $1;
-  `, [id])
-  return 
-} catch (error) {
-  throw error
-}
+  `,
+      [id]
+    );
+    return;
+  } catch (error) {
+    throw error;
+  }
 }
 
-
-async function deleteLinkById({id}) {
+async function deleteLinkById({ id }) {
   try {
-    const response = client.query(`
+    const response = await client.query(
+      `
     DELETE FROM links
     WHERE id = $1;
-    `, [id])
-    return 
+    `,
+      [id]
+    );
+    return;
   } catch (error) {
-    throw error
+    throw error;
   }
+}
+
+async function addClick({ id }) {
+  try {
+    const response = await client.query(
+      `
+    UPDATE links 
+    SET click_count = click_count + 1
+    WHERE id = $1 RETURNING *;
+    `,[id]
+    );
+    console.log(response.rows);
+    return;
+  } catch (error) {
+    throw error;
   }
-  
+}
 
 // export
 module.exports = {
@@ -148,5 +171,6 @@ module.exports = {
   deleteLinkTags,
   deleteFromLinkTagsByLinkId,
   deleteLinkById,
+  addClick,
   // db methods
 };
